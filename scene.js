@@ -6,6 +6,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { buildCampus, lightCampus, CAMPUS_REVISION } from './campus.js';
+import { createCampusInteriors, INTERIOR_REVISION } from './campus-interiors.js';
 
 export const CHAPTERS = [
   { at: .02, index: "01", kicker: "Integrated platform", title: "American Made Energy", body: "A connected landscape of manufacturing, generation, compute and circular recovery — presented as one explorable energy ecosystem.", explore: "Explore the master campus", focus: [-2,3,18], min: 34, max: 110, metrics: [["4","connected systems"],["Real-time","WebGL model"]] },
@@ -66,6 +67,10 @@ export class EnergyScene {
     this.high=quality==='high';this.ready=false;this.wasExplore=false;this.exploreChapter=-1;
     this.topViewHighRes=false;this.exploreBaseFov=40;
     this.time=0;this.previous=0;this.frameSamples=[];this.degraded=false;
+    this.reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.interiorMode=false;this.currentInterior=null;this.savedExteriorPose=null;
+    this.walkKeys=new Set();this.interiorYaw=0;this.interiorPitch=0;this.lookPointer=null;
+    this.navigationFlight=null;this.onInteriorChange=null;
     this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:this.high?'high-performance':'default'});
     this.renderer.outputColorSpace=THREE.SRGBColorSpace;
     this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.0;
@@ -76,13 +81,54 @@ export class EnergyScene {
     this.look=new THREE.Vector3();this.desired=new THREE.Vector3();this.targetLook=new THREE.Vector3();
     this.lighting=lightCampus(this.scene,this.renderer,this.high);
     this.campus=buildCampus(this.scene,this.renderer,this.high);
+    // Add-only internal models: no exterior transforms, meshes or roads are edited.
+    this.interiors=createCampusInteriors(this.scene,{high:this.high});
+    this.daylight={
+      sunPosition:this.lighting.sun.position.clone(),
+      sunColor:this.lighting.sun.color.clone(),
+      sunIntensity:this.lighting.sun.intensity,
+      hemi:this.scene.children.find(o=>o.isHemisphereLight),
+      background:this.scene.background.clone(),
+      fog:this.scene.fog.color.clone()
+    };
     this.controls=new OrbitControls(this.camera,canvas);this.controls.enabled=false;
-    this.controls.enableDamping=true;this.controls.dampingFactor=.065;this.controls.enablePan=false;
+    this.controls.enableDamping=true;this.controls.dampingFactor=.065;
+    this.controls.enablePan=true;this.controls.screenSpacePanning=false;
     this.controls.zoomSpeed=.72;this.controls.rotateSpeed=.46;
+    this.onInteriorKeyDown=(e)=>{
+      if(!this.interiorMode||e.target?.closest?.('input,textarea,select,[contenteditable]'))return;
+      const k=e.key.toLowerCase(),keys=['w','a','s','d','arrowup','arrowleft','arrowdown','arrowright','shift'];
+      if(keys.includes(k)){e.preventDefault();this.walkKeys.add(k);}
+    };
+    this.onInteriorKeyUp=(e)=>{this.walkKeys.delete(e.key.toLowerCase());};
+    this.onInteriorBlur=()=>{this.walkKeys.clear();this.lookPointer=null;};
+    this.onExplorePointerDown=()=>{if(!this.interiorMode)this.navigationFlight=null;};
+    this.onInteriorPointerDown=(e)=>{
+      if(!this.interiorMode||e.button!==0)return;
+      this.lookPointer=e.pointerId;this.pointerLastX=e.clientX;this.pointerLastY=e.clientY;
+      canvas.setPointerCapture?.(e.pointerId);
+    };
+    this.onInteriorPointerMove=(e)=>{
+      if(!this.interiorMode||this.lookPointer!==e.pointerId)return;
+      const dx=e.clientX-this.pointerLastX,dy=e.clientY-this.pointerLastY;
+      this.pointerLastX=e.clientX;this.pointerLastY=e.clientY;
+      this.interiorYaw-=dx*.0030;
+      this.interiorPitch=THREE.MathUtils.clamp(this.interiorPitch-dy*.0026,-1.10,1.10);
+    };
+    this.onInteriorPointerUp=(e)=>{if(this.lookPointer===e.pointerId)this.lookPointer=null;};
+    window.addEventListener('keydown',this.onInteriorKeyDown);
+    window.addEventListener('keyup',this.onInteriorKeyUp);
+    window.addEventListener('blur',this.onInteriorBlur);
+    canvas.addEventListener('pointerdown',this.onExplorePointerDown);
+    canvas.addEventListener('pointerdown',this.onInteriorPointerDown);
+    canvas.addEventListener('pointermove',this.onInteriorPointerMove);
+    canvas.addEventListener('pointerup',this.onInteriorPointerUp);
+    canvas.addEventListener('pointercancel',this.onInteriorPointerUp);
     this.setupPost();this.resize();
     this.onResize=()=>this.resize();addEventListener('resize',this.onResize);
     this.onVisibility=()=>{this.previous=0;};document.addEventListener('visibilitychange',this.onVisibility);
     canvas.dataset.campusRevision=CAMPUS_REVISION;
+    canvas.dataset.interiorRevision=INTERIOR_REVISION;
     if(new URLSearchParams(location.search).has('qa'))window.__campusScene=this;
   }
   setupPost(){
@@ -136,7 +182,14 @@ export class EnergyScene {
     if(document.hidden)return;
     const raw=this.previous?Math.max(0,(now-this.previous)/1000):1/60;this.previous=now;
     const dt=Math.min(raw,.075);this.time+=dt;this.syncExplore();
-    if(this.getExploring()){this.controls.update(dt);this.syncTopViewQuality(dt);}
+    if(this.getExploring()){
+      if(this.interiorMode)this.updateInteriorWalk(dt);
+      else{
+        this.controls.update(dt);
+        this.updateExteriorNavigation(dt);
+        this.syncTopViewQuality(dt);
+      }
+    }
     else{
       const pose=sampleCamera(this.getProgress()),mouse=this.getMouse();
       this.desired.set(pose.p[0]+mouse.x*1.1,pose.p[1]+mouse.y*.45,pose.p[2]);
@@ -145,7 +198,10 @@ export class EnergyScene {
       this.camera.position.lerp(this.desired,k);this.look.lerp(this.targetLook,k);this.camera.lookAt(this.look);
       this.camera.fov+=(pose.f-this.camera.fov)*k;this.camera.updateProjectionMatrix();
     }
-    this.campus.animate(this.time);
+    if(!this.reducedMotion){
+      this.campus.animate(this.time);
+      this.interiors.update(this.time);
+    }
     if(this.composer)this.composer.render();else this.renderer.render(this.scene,this.camera);
     if(!this.ready){this.ready=true;this.onReady?.();}
     // Use unclamped frame intervals for quality decisions, never hide stalls.
@@ -157,10 +213,134 @@ export class EnergyScene {
       }
     }
   };
+
+  // The existing OrbitControls remains the exterior camera owner.
+  updateExteriorNavigation(dt){
+    if(this.navigationFlight){
+      const f=this.navigationFlight;
+      f.elapsed+=dt;
+      const u=THREE.MathUtils.clamp(f.elapsed/f.duration,0,1);
+      const e=u*u*(3-2*u);
+      this.controls.target.copy(f.fromTarget).lerp(f.toTarget,e);
+      this.camera.position.copy(f.fromPosition).lerp(f.toPosition,e);
+      this.controls.update();
+      if(u>=1)this.navigationFlight=null;
+    }
+    // Pan the target and camera together so dragging cannot leave the island.
+    const before=this.controls.target.clone();
+    this.controls.target.x=THREE.MathUtils.clamp(this.controls.target.x,-53,53);
+    this.controls.target.y=THREE.MathUtils.clamp(this.controls.target.y,.5,12);
+    this.controls.target.z=THREE.MathUtils.clamp(this.controls.target.z,-106,56);
+    this.camera.position.add(this.controls.target.clone().sub(before));
+    this.controls.update();
+  }
+  focusFacility(id){
+    if(!this.getExploring())return false;
+    const def=this.interiors.get(id);
+    if(!def)return false;
+    if(this.interiorMode)this.exitInterior();
+    const target=new THREE.Vector3(def.x,Math.min(def.h*.5,4),def.z);
+    const position=new THREE.Vector3(def.x+Math.min(21,def.w*.82),12,def.z+Math.min(22,def.d*1.4));
+    this.controls.enabled=true;
+    this.controls.minDistance=7;this.controls.maxDistance=85;
+    this.navigationFlight={
+      fromTarget:this.controls.target.clone(),toTarget:target,
+      fromPosition:this.camera.position.clone(),toPosition:position,
+      duration:this.reducedMotion?.01:1.15,elapsed:0
+    };
+    return true;
+  }
+  enterInterior(id){
+    if(!this.getExploring())return false;
+    const def=this.interiors.get(id);
+    const spawn=this.interiors.start(id);
+    if(!def||!spawn||!this.interiors.canMove(id,spawn.x,spawn.z))return false;
+    if(this.interiorMode)this.exitInterior();
+    this.navigationFlight=null;
+    this.savedExteriorPose={
+      position:this.camera.position.clone(),target:this.controls.target.clone(),
+      min:this.controls.minDistance,max:this.controls.maxDistance,fov:this.camera.fov
+    };
+    this.currentInterior=id;
+    this.interiorMode=true;
+    this.walkKeys.clear();
+    this.controls.enabled=false;
+    this.interiors.setActive(id);
+    this.camera.position.copy(spawn);
+    this.camera.fov=67;this.camera.updateProjectionMatrix();
+    this.interiorYaw=def.yaw;this.interiorPitch=0;
+    if(this.topViewHighRes){this.topViewHighRes=false;this.resize();}
+    this.updateInteriorWalk(0);
+    this.onInteriorChange?.();
+    return true;
+  }
+  exitInterior(){
+    if(!this.interiorMode)return false;
+    this.walkKeys.clear();this.lookPointer=null;this.interiors.setActive(null);
+    this.interiorMode=false;this.currentInterior=null;
+    this.controls.enabled=this.getExploring();
+    const save=this.savedExteriorPose;this.savedExteriorPose=null;
+    if(save){
+      this.camera.position.copy(save.position);this.controls.target.copy(save.target);
+      this.controls.minDistance=save.min;this.controls.maxDistance=save.max;
+      this.camera.fov=save.fov;this.camera.updateProjectionMatrix();
+      this.controls.update();
+    }
+    this.onInteriorChange?.();
+    return true;
+  }
+  setWalkAction(key,down){
+    if(!['w','a','s','d'].includes(key))return;
+    if(down&&this.interiorMode)this.walkKeys.add(key);
+    else this.walkKeys.delete(key);
+  }
+  updateInteriorWalk(dt){
+    if(!this.interiorMode)return;
+    const keys=this.walkKeys,pressed=(...k)=>k.some(key=>keys.has(key));
+    const forward=(pressed('w','arrowup')?1:0)-(pressed('s','arrowdown')?1:0);
+    const strafe=(pressed('d','arrowright')?1:0)-(pressed('a','arrowleft')?1:0);
+    const len=Math.hypot(forward,strafe)||1;
+    const speed=pressed('shift')?4.6:2.7,step=speed*dt/len;
+    const dx=(-Math.sin(this.interiorYaw)*forward+Math.cos(this.interiorYaw)*strafe)*step;
+    const dz=(-Math.cos(this.interiorYaw)*forward-Math.sin(this.interiorYaw)*strafe)*step;
+    const x=this.camera.position.x+dx,z=this.camera.position.z+dz;
+    if(this.interiors.canMove(this.currentInterior,x,this.camera.position.z))this.camera.position.x=x;
+    if(this.interiors.canMove(this.currentInterior,this.camera.position.x,z))this.camera.position.z=z;
+    this.camera.position.y=1.7;
+    const cy=Math.cos(this.interiorPitch);
+    this.camera.lookAt(
+      this.camera.position.x-Math.sin(this.interiorYaw)*cy,
+      this.camera.position.y+Math.sin(this.interiorPitch),
+      this.camera.position.z-Math.cos(this.interiorYaw)*cy
+    );
+  }
+  setLightingMode(mode){
+    if(mode!=='day'&&mode!=='golden')return false;
+    const sun=this.lighting.sun,day=this.daylight;
+    if(mode==='golden'){
+      sun.position.set(-72,33,63);sun.color.setHex(0xffd3a0);sun.intensity=2.55;
+      if(day.hemi)day.hemi.intensity=.45;
+      this.scene.background.setHex(0x53675d);this.scene.fog.color.setHex(0x657568);
+    }else{
+      sun.position.copy(day.sunPosition);sun.color.copy(day.sunColor);sun.intensity=day.sunIntensity;
+      if(day.hemi)day.hemi.intensity=.64;
+      this.scene.background.copy(day.background);this.scene.fog.color.copy(day.fog);
+    }
+    return true;
+  }
   start(){this.previous=0;this.renderer.setAnimationLoop(this.tick);}
   dispose(){
     this.renderer.setAnimationLoop(null);removeEventListener('resize',this.onResize);
-    document.removeEventListener('visibilitychange',this.onVisibility);this.controls.dispose();
+    document.removeEventListener('visibilitychange',this.onVisibility);
+    window.removeEventListener('keydown',this.onInteriorKeyDown);
+    window.removeEventListener('keyup',this.onInteriorKeyUp);
+    window.removeEventListener('blur',this.onInteriorBlur);
+    this.controls.domElement.removeEventListener('pointerdown',this.onExplorePointerDown);
+    this.controls.domElement.removeEventListener('pointerdown',this.onInteriorPointerDown);
+    this.controls.domElement.removeEventListener('pointermove',this.onInteriorPointerMove);
+    this.controls.domElement.removeEventListener('pointerup',this.onInteriorPointerUp);
+    this.controls.domElement.removeEventListener('pointercancel',this.onInteriorPointerUp);
+    this.controls.dispose();this.interiors.dispose();
     this.disposePost();this.campus.dispose();this.lighting.dispose();this.renderer.dispose();
     if(window.__campusScene===this)delete window.__campusScene;
   }
@@ -169,7 +349,7 @@ export function detectQuality(){
   try{
     const canvas=document.createElement('canvas'),gl=canvas.getContext('webgl2');
     if(!gl)return 'fallback';gl.getExtension('WEBGL_lose_context')?.loseContext();
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return 'fallback';
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return 'lite';
     return (navigator.hardwareConcurrency||4)<=2||(navigator.deviceMemory||4)<=2||innerWidth<560?'lite':'high';
   }catch{return 'fallback';}
 }
