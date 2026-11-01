@@ -3,10 +3,10 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
-const gitBlob=txt=>createHash('sha1').update('blob '+Buffer.byteLength(txt)+'\0').update(txt).digest('hex');
+const gitBlob=txt=>{const normalized=txt.replace(/\r\n/g,'\n');return createHash('sha1').update('blob '+Buffer.byteLength(normalized)+'\0').update(normalized).digest('hex');};
 const campus=read('campus.js'),index=read('index.html'),css=read('styles.css');
 const interiors=read('campus-interiors.js'),scene=read('scene.js'),app=read('app.js');
-const explore=read('explore-ui.js'),styles=read('explore-enhancements.css');
+const explore=read('explore-ui.js'),styles=read('explore-enhancements.css'),polish=read('interior-polish.js');
 
 assert.equal(gitBlob(campus),'7bcd4ea716879d3525a272eb8a6812dd63f0affa','Approved campus geometry must remain byte-identical.');
 assert.equal(gitBlob(index),'f7c5baa8bbcc856dd776aebd4776847c2c4f02fd','Approved HTML must remain byte-identical.');
@@ -27,6 +27,9 @@ assert.ok(interiors.includes("entrance:[0,0]"),'Manufacturing entry must be in t
 assert.ok(interiors.includes("entrance:[-1.8,0]"),'Recycling entry must be in the clear central aisle.');
 assert.ok(interiors.includes('function withinInterior')||interiors.includes('export function withinInterior'),'Interior wall/collision contract missing.');
 assert.ok(interiors.includes('register(zone,'),'Interior equipment must register collision footprints.');
+assert.ok(interiors.includes('enhanceInterior(zone,def,{high})'),'Interior polish must be applied to each existing hall.');
+assert.ok(polish.includes("export const POLISH_REVISION='interiors-v1.1.0'"),'Polish revision contract missing.');
+for(const detail of ['HJT PRODUCTION','COMPUTE HALL ','THERMAL MANAGEMENT','NETWORK & POWER','SORTING & RECOVERY'])assert.ok(polish.includes(detail),'Missing distinctive interior feature '+detail);
 assert.ok(interiors.includes('setActive(id)'),'Interior isolation/visibility contract missing.');
 assert.ok(interiors.includes('canMove(id,x,z)'),'Movement constraints missing.');
 assert.ok(scene.includes('createCampusInteriors(this.scene'),'Real Three.js interior builder not connected.');
