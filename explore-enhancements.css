@@ -30,3 +30,16 @@
   .facility-note{display:none}
 }
 @media(prefers-reduced-motion:reduce){.facility-tools *{scroll-behavior:auto!important;transition-duration:0s!important}}
+
+/* Facility markers are UI overlays anchored to actual 3D hall centers. */
+.facility-pin-layer{position:fixed;inset:0;z-index:18;pointer-events:none}
+.facility-pin{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;
+  min-height:29px;width:auto;padding:7px 11px;border:1px solid rgba(210,239,180,.55);
+  border-radius:99px;color:#edf8df;background:rgba(7,36,26,.81);
+  backdrop-filter:blur(9px);box-shadow:0 6px 30px rgba(0,0,0,.28);
+  font:600 10px/1.2 "Outfit",system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.facility-pin:before{content:"";position:absolute;left:calc(50% - 3px);bottom:-9px;width:6px;height:6px;
+  background:#d5efa4;border-radius:50%;box-shadow:0 0 0 4px rgba(16,49,33,.62)}
+.facility-pin:hover,.facility-pin:focus-visible{background:#d9ecad;color:#14291c}
+.facility-pin-layer[hidden]{display:none!important}
+@media(max-width:650px){.facility-pin{font-size:9px;min-height:27px;padding:5px 8px}}
