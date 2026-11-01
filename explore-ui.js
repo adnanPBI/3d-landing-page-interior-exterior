@@ -2,6 +2,8 @@
  * Extends the existing Free Explore glass panel without modifying the approved
  * header, hero, status card, chapter rail, index.html or styles.css.
  */
+import * as THREE from 'three';
+
 export function mountExploreUI(scene, panel){
   if(!scene||!panel)throw Error('Explore UI requires the EnergyScene and panel.');
   const section=document.createElement('section');
@@ -74,7 +76,43 @@ export function mountExploreUI(scene, panel){
   const stylesheet=document.createElement('link');
   stylesheet.rel='stylesheet';stylesheet.href='/explore-enhancements.css';stylesheet.dataset.convaltExplore='1';
   document.head.appendChild(stylesheet);
-  scene.onInteriorChange=update;
+  // Clickable WebGL-linked POIs, visible only in exterior exploration.
+  const pins=document.createElement('div');pins.className='facility-pin-layer';pins.hidden=true;
+  (document.getElementById('app')||document.body).appendChild(pins);
+  const vec=new THREE.Vector3(),hotspots=[];
+  for(const def of scene.interiors.spaces){
+    const b=document.createElement('button');
+    b.type='button';b.className='facility-pin';b.textContent=def.short;
+    b.setAttribute('aria-label','Focus '+def.label);
+    b.addEventListener('click',()=>{
+      select.value=def.id;scene.focusFacility(def.id);update();
+    });
+    pins.appendChild(b);hotspots.push({def,button:b});
+  }
+  let lastProjection=0;
+  const project=()=>{
+    const visible=scene.getExploring()&&!scene.interiorMode;
+    pins.hidden=!visible;
+    if(!visible)return;
+    for(const {def,button} of hotspots){
+      vec.set(def.x,def.h+2.1,def.z).project(scene.camera);
+      const inView=vec.z>-1&&vec.z<1&&Math.abs(vec.x)<.84&&Math.abs(vec.y)<.80;
+      button.hidden=!inView;
+      if(inView){
+        button.style.left=((vec.x+1)*50)+'%';
+        button.style.top=((1-vec.y)*50)+'%';
+      }
+    }
+  };
+  scene.onFrame=()=>{
+    const now=performance.now();
+    if(now-lastProjection>120){lastProjection=now;project();}
+  };
+  scene.onInteriorChange=()=>{update();project();};
   update();
-  return {update,dispose(){section.remove();stylesheet.remove();panel.classList.remove('with-facility-tools','inside-building');if(scene.onInteriorChange===update)scene.onInteriorChange=null;}};
+  return {update,dispose(){
+    section.remove();stylesheet.remove();pins.remove();scene.onFrame=null;
+    panel.classList.remove('with-facility-tools','inside-building');
+    scene.onInteriorChange=null;
+  }};
 }
