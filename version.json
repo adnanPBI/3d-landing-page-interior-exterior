@@ -1,5 +1,5 @@
 {
-  "revision": "campus-v5.4.5-screenshot-mapped-two-tree-removal-20260925",
+  "revision": "convalt-interior-exterior-v1.0.0-20261101",
   "sourceRepository": "adnanPBI/3d-landing-page-energy-company",
   "sourceBranch": "main",
   "baseCommit": "98b992b4890248b30d8052d93daaaf0e83f04222",
@@ -7,8 +7,12 @@
     "campus.js": "7bcd4ea716879d3525a272eb8a6812dd63f0affa",
     "campus-materials.js": "07af3820680b4fbaf00d5c1307bca4c5b1978268",
     "campus-water.js": "a8e69c96af1e873d8de4b197014d98198e8d2f14",
-    "scene.js": "b12b45e4491342b33ae0a5886af108c8d462c74e",
-    "campus-fence.js": "4fa8aa442fcab02d579f1261bd806bccb89b5404"
+    "scene.js": "671a85c8ecbcfa2b3925a92a502b8523e9478dca",
+    "campus-fence.js": "4fa8aa442fcab02d579f1261bd806bccb89b5404",
+    "app.js": "b063ecfa05f5150fbf6cd3992f2ee3335722f69e",
+    "campus-interiors.js": "afb79abedaf6aa765119ccf45624f09ebb8323ef",
+    "explore-ui.js": "64e7b655e474253dc230eb5322a043949742363b",
+    "explore-enhancements.css": "e3bb9d5a09487df9292a69c16111d8ca2bd7228b"
   },
   "preservedUIBlobs": {
     "index.html": "f7c5baa8bbcc856dd776aebd4776847c2c4f02fd",
@@ -555,5 +559,88 @@
       "otherScene": "Buildings, roads, EV/service equipment, pond, PV field/fence, UI and cameras unchanged."
     },
     "regression": "tests/two-specific-tree-removals.mjs"
+  },
+  "exteriorSourceRevision": "campus-v5.4.5-screenshot-mapped-two-tree-removal-20260925",
+  "sourceCommit": "b1de42b2d9b321df9633707a4c2c242e1252a1ae",
+  "destinationRepository": "adnanPBI/3d-landing-page-interior-exterior",
+  "interiorExteriorEdition": {
+    "designPolicy": "Approved exterior/site coordinates, building/road/solar/turbine geometry and existing UI markup/styles are byte-for-byte preserved. No new site structures.",
+    "protectedBlobs": {
+      "campus.js": "7bcd4ea716879d3525a272eb8a6812dd63f0affa",
+      "index.html": "f7c5baa8bbcc856dd776aebd4776847c2c4f02fd",
+      "styles.css": "e75303165de4674aa9bdd4fd5a9ccc4a8e8115ff"
+    },
+    "interiorRevision": "convalt-interior-exterior-v1.0.0",
+    "interiorZones": [
+      {
+        "id": "manufacturing",
+        "center": [
+          -16,
+          35
+        ],
+        "dims": [
+          34,
+          18,
+          7
+        ]
+      },
+      {
+        "id": "compute-01",
+        "center": [
+          11,
+          -45
+        ],
+        "dims": [
+          29,
+          9,
+          6.4
+        ]
+      },
+      {
+        "id": "compute-02",
+        "center": [
+          11,
+          -58
+        ],
+        "dims": [
+          29,
+          9,
+          6.4
+        ]
+      },
+      {
+        "id": "compute-03",
+        "center": [
+          11,
+          -71
+        ],
+        "dims": [
+          29,
+          9,
+          6.4
+        ]
+      },
+      {
+        "id": "recycling",
+        "center": [
+          -12,
+          -89
+        ],
+        "dims": [
+          27,
+          17,
+          6.8
+        ]
+      }
+    ],
+    "navigation": "Free Explore bounded orbit/pan; select facility; enter conceptual interiors; WASD/arrow-key or touch-pad movement with wall/equipment collision; exit restores prior exterior camera; resume original chapter journey.",
+    "mood": "Daylight unchanged by default; optional golden-hour lighting (without new structures).",
+    "claims": "Illustrative conceptual equipment, not surveyed digital twin or real-time telemetry.",
+    "verification": {
+      "sourceParity": "sha1 blob parity checked on protected paths",
+      "functionalChecks": "GitHub Actions Node syntax and source contract configured",
+      "browserWebGL": "pending real browser verification",
+      "physicalDeviceFPS": "not certified"
+    }
   }
 }
