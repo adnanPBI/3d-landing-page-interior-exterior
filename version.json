@@ -1,5 +1,5 @@
 {
-  "revision": "convalt-interior-exterior-v1.0.0-20261101",
+  "revision": "convalt-interior-exterior-v1.1.0-20261101",
   "sourceRepository": "adnanPBI/3d-landing-page-energy-company",
   "sourceBranch": "main",
   "baseCommit": "98b992b4890248b30d8052d93daaaf0e83f04222",
@@ -10,9 +10,10 @@
     "scene.js": "918c05de4f5f67dca6cb031051ec30943117e8d2",
     "campus-fence.js": "4fa8aa442fcab02d579f1261bd806bccb89b5404",
     "app.js": "b063ecfa05f5150fbf6cd3992f2ee3335722f69e",
-    "campus-interiors.js": "afb79abedaf6aa765119ccf45624f09ebb8323ef",
+    "campus-interiors.js": "47c681cba5dd02eb47d0cde0eb66dcc7a6099dc2",
     "explore-ui.js": "c571e8ea026b52467e3db63384cefd10d181b2b3",
-    "explore-enhancements.css": "2faf89959880e78dd1326700af0d2bf0ad88cc1f"
+    "explore-enhancements.css": "2faf89959880e78dd1326700af0d2bf0ad88cc1f",
+    "interior-polish.js": "4dfc3ffa723b54ec151007318a964064089062e4"
   },
   "preservedUIBlobs": {
     "index.html": "f7c5baa8bbcc856dd776aebd4776847c2c4f02fd",
@@ -570,7 +571,7 @@
       "index.html": "f7c5baa8bbcc856dd776aebd4776847c2c4f02fd",
       "styles.css": "e75303165de4674aa9bdd4fd5a9ccc4a8e8115ff"
     },
-    "interiorRevision": "convalt-interior-exterior-v1.0.0",
+    "interiorRevision": "convalt-interior-exterior-v1.1.0",
     "interiorZones": [
       {
         "id": "manufacturing",
@@ -641,6 +642,20 @@
       "functionalChecks": "Node 22 syntax/source-contract GitHub Actions passed on committed module revisions; full WebGL QA is separate.",
       "browserWebGL": "pending real browser verification",
       "physicalDeviceFPS": "not certified"
+    },
+    "interiorPolish": {
+      "revision": "interiors-v1.1.0",
+      "features": {
+        "manufacturing": "Optical inspection details, guarded module conveyors, HMI controls, elevated utility rails and line identification",
+        "compute01": "Detailed server modules and ports, cool aisle lighting and IT operations wayfinding",
+        "compute02": "Thermal distribution pipes, illuminated cooling indicators and enhanced server rows",
+        "compute03": "Dense structured cabling, network distribution assemblies and unique technical identity",
+        "recycling": "Additional sorting hoods, guarded conveyor details, material staging and process identification",
+        "global": "Higher-fidelity PBR material separation, overhead cable systems, wall panel detailing, impact skirting, integrated wayfinding and quality tier controls"
+      },
+      "scope": "Interiors only; campus.js, index.html, styles.css and world mapping remain unmodified",
+      "verifiedSourceContract": "Windows CRLF-safe hash regression passed on RND Windows device",
+      "browserQA": "Pending live browser audit"
     }
   }
 }
