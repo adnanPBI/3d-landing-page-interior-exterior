@@ -7,12 +7,12 @@
     "campus.js": "7bcd4ea716879d3525a272eb8a6812dd63f0affa",
     "campus-materials.js": "07af3820680b4fbaf00d5c1307bca4c5b1978268",
     "campus-water.js": "a8e69c96af1e873d8de4b197014d98198e8d2f14",
-    "scene.js": "671a85c8ecbcfa2b3925a92a502b8523e9478dca",
+    "scene.js": "918c05de4f5f67dca6cb031051ec30943117e8d2",
     "campus-fence.js": "4fa8aa442fcab02d579f1261bd806bccb89b5404",
     "app.js": "b063ecfa05f5150fbf6cd3992f2ee3335722f69e",
     "campus-interiors.js": "afb79abedaf6aa765119ccf45624f09ebb8323ef",
-    "explore-ui.js": "64e7b655e474253dc230eb5322a043949742363b",
-    "explore-enhancements.css": "e3bb9d5a09487df9292a69c16111d8ca2bd7228b"
+    "explore-ui.js": "c571e8ea026b52467e3db63384cefd10d181b2b3",
+    "explore-enhancements.css": "2faf89959880e78dd1326700af0d2bf0ad88cc1f"
   },
   "preservedUIBlobs": {
     "index.html": "f7c5baa8bbcc856dd776aebd4776847c2c4f02fd",
@@ -633,12 +633,12 @@
         ]
       }
     ],
-    "navigation": "Free Explore bounded orbit/pan; select facility; enter conceptual interiors; WASD/arrow-key or touch-pad movement with wall/equipment collision; exit restores prior exterior camera; resume original chapter journey.",
+    "navigation": "Free Explore bounded orbit/pan; select facility; enter conceptual interiors; WASD/arrow-key or touch-pad movement with wall/equipment collision; exit restores prior exterior camera; resume original chapter journey. Five world-projected clickable facility POI markers in exterior Explore mode.",
     "mood": "Daylight unchanged by default; optional golden-hour lighting (without new structures).",
     "claims": "Illustrative conceptual equipment, not surveyed digital twin or real-time telemetry.",
     "verification": {
       "sourceParity": "sha1 blob parity checked on protected paths",
-      "functionalChecks": "GitHub Actions Node syntax and source contract configured",
+      "functionalChecks": "Node 22 syntax/source-contract GitHub Actions passed on committed module revisions; full WebGL QA is separate.",
       "browserWebGL": "pending real browser verification",
       "physicalDeviceFPS": "not certified"
     }
