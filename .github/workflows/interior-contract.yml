@@ -1,0 +1,27 @@
+name: Interior + exterior release contract
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  source-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: JavaScript syntax checks
+        run: |
+          node --check app.js
+          node --check scene.js
+          node --check campus-interiors.js
+          node --check explore-ui.js
+          node --check campus.js
+      - name: Preserved exterior and new exploration contracts
+        run: node --test tests/interior-explore-contract.mjs
