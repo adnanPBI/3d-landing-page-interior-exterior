@@ -8,7 +8,7 @@ import * as THREE from 'three';
 export const INTERIOR_REVISION = 'convalt-interior-exterior-v1.0.0';
 export const INTERIOR_SPACES = Object.freeze([
   {id:'manufacturing',label:'Manufacturing plant',short:'Manufacturing',kind:'factory',x:-16,z:35,w:34,d:18,h:7,yaw:0,
-   entrance:[0,5.65],description:'Illustrative HJT manufacturing flow, service lanes and production equipment.'},
+   entrance:[0,0],description:'Illustrative HJT manufacturing flow, service lanes and production equipment.'},
   {id:'compute-01',label:'Compute hall 01',short:'Compute 01',kind:'compute',variant:0,x:11,z:-45,w:29,d:9,h:6.4,yaw:-Math.PI/2,
    entrance:[-10,0],description:'Server racks, cooling flow and controlled access aisles.'},
   {id:'compute-02',label:'Compute hall 02',short:'Compute 02',kind:'compute',variant:1,x:11,z:-58,w:29,d:9,h:6.4,yaw:-Math.PI/2,
@@ -16,7 +16,7 @@ export const INTERIOR_SPACES = Object.freeze([
   {id:'compute-03',label:'Compute hall 03',short:'Compute 03',kind:'compute',variant:2,x:11,z:-71,w:29,d:9,h:6.4,yaw:-Math.PI/2,
    entrance:[-10,0],description:'Network cabinets, power cabinets and service monitoring.'},
   {id:'recycling',label:'Material recycling plant',short:'Recycling',kind:'recycling',x:-12,z:-89,w:27,d:17,h:6.8,yaw:0,
-   entrance:[0,5.8],description:'Sorting stations, recovered-material handling and protected inspection aisles.'}
+   entrance:[-1.8,0],description:'Sorting stations, recovered-material handling and protected inspection aisles.'}
 ]);
 
 const BODY_RADIUS=.34;
