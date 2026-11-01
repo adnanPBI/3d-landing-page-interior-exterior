@@ -203,6 +203,7 @@ export class EnergyScene {
       this.interiors.update(this.time);
     }
     if(this.composer)this.composer.render();else this.renderer.render(this.scene,this.camera);
+    this.onFrame?.();
     if(!this.ready){this.ready=true;this.onReady?.();}
     // Use unclamped frame intervals for quality decisions, never hide stalls.
     if(this.high&&!this.degraded&&this.time>4){
