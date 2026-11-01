@@ -1,0 +1,559 @@
+{
+  "revision": "campus-v5.4.5-screenshot-mapped-two-tree-removal-20260925",
+  "sourceRepository": "adnanPBI/3d-landing-page-energy-company",
+  "sourceBranch": "main",
+  "baseCommit": "98b992b4890248b30d8052d93daaaf0e83f04222",
+  "runtimeBlobs": {
+    "campus.js": "7bcd4ea716879d3525a272eb8a6812dd63f0affa",
+    "campus-materials.js": "07af3820680b4fbaf00d5c1307bca4c5b1978268",
+    "campus-water.js": "a8e69c96af1e873d8de4b197014d98198e8d2f14",
+    "scene.js": "b12b45e4491342b33ae0a5886af108c8d462c74e",
+    "campus-fence.js": "4fa8aa442fcab02d579f1261bd806bccb89b5404"
+  },
+  "preservedUIBlobs": {
+    "index.html": "f7c5baa8bbcc856dd776aebd4776847c2c4f02fd",
+    "styles.css": "e75303165de4674aa9bdd4fd5a9ccc4a8e8115ff",
+    "app.js": "a6f342e79760a46ddb44654f9e761c9aadd6f236"
+  },
+  "qualityPatch": {
+    "solarSampling": "lower-frequency atlas + mipmaps + clamped edges + renderer-capped anisotropy",
+    "pvSurfaceElevationMeters": 0.09,
+    "topViewSupersampleFloor": 1.75,
+    "topViewPixelRatioCap": 2,
+    "topViewFovDegrees": 38,
+    "adaptiveFallback": "existing sustained-frame-time degradation remains active"
+  },
+  "hotfix": {
+    "issue": "asset beauty pass referenced TAU in campus.js without a local declaration, causing WebGL initialization to fall back",
+    "correction": "define TAU as Math.PI * 2 in campus.js before scene construction",
+    "preserves": "V5.2 asset beauty geometry, V5.1 solar stability/top-view rendering, approved UI"
+  },
+  "fenceFix": {
+    "cause": "Opaque grille planes were rotated perpendicular to fence segments and extended over lawn and road.",
+    "correction": "Open wire geometry aligned to segment boundaries; no opaque infill planes.",
+    "regression": "tests/fence-regression.mjs; actual Three.js geometry, four boundary corridors and open-cell raycasts passed.",
+    "visualVerification": "Pending WebGL-capable browser; cloud browser shows fallback."
+  },
+  "solarClearanceFix": {
+    "inverters": "Move three units to x=22.2 with terrain-seated concrete pads; minimum conservative panel-edge gap 1.06m.",
+    "turbines": "Move eastern turbine to (28,-4) and rear turbine to (15,-34.5); keep plinths clear of fences and road.",
+    "verification": "Production placement regression and existing fence regression passed. Rendered visual verification pending."
+  },
+  "utilityYardFenceFix": {
+    "rearBoundaryZ": -34,
+    "rearTurbineZ": -36,
+    "minimumApronCurbToFenceMeters": 1.355,
+    "verification": "Source-derived placement checks cover both utility pads, all five utility cabinets, three aisle inverters and three turbine foundations. Closed fence geometry regression passes. Visual verification pending."
+  },
+  "turbineSightlineFix": {
+    "issue": "Front/eastern turbine visually overlapped the manufacturing facade in the Power Generation / free-explore view.",
+    "correction": "Relocate the front turbine from (28,-4) to (-13,15), centered in the open grass corridor between the PV field and manufacturing apron.",
+    "minimumSolarFenceClearanceMeters": 8.992,
+    "minimumManufacturingApronClearanceMeters": 8.793,
+    "minimumReflectingGardenClearanceMeters": 16.065,
+    "preserves": "Other two turbine placements, solar field, utility yard, approved UI and camera/navigation behavior.",
+    "verification": "Source-derived clearance regression updated; rendered browser QA still required.",
+    "status": "SUPERSEDED_BY_TURBINE_ROLE_PLACEMENT_FIX"
+  },
+  "turbineRolePlacementFix": {
+    "issue": "The prior sightline patch moved the front turbine when the requested relocation applied to the rear turbine.",
+    "correction": {
+      "front": "Move front turbine from (-13,15) to (-4,11.2): a modest backward/right shift that keeps it readable in the Horizon overview.",
+      "middle": "Keep middle/eastern turbine unchanged at (32,-18).",
+      "rear": "Move rear turbine from (15,-36) to (30,-37.2), beside Compute Hall 01 in the north-east grass pocket."
+    },
+    "clearances": {
+      "frontSolarFenceMeters": 5.1925,
+      "frontManufacturingApronMeters": 12.5925,
+      "rearComputeApronEastMeters": 2.465,
+      "rearComputeApronNorthMeters": 1.265,
+      "rearEasternRoadCurbMeters": 3.44
+    },
+    "preserves": "Three-turbine mechanical assemblies, rotor animation, solar field/fence, compute halls, road network, camera journey and approved interface.",
+    "verification": "Source-derived turbine role/clearance regression updated; rendered visual verification remains separate.",
+    "status": "SUPERSEDED_FOR_REAR_TURBINE_BY_LAWN_PLACEMENT_FIX"
+  },
+  "rearTurbineLawnPlacementFix": {
+    "issue": "The role-correction commit moved the rear turbine beside Compute Hall 01 instead of onto the large lawn indicated by the user's annotated screenshot.",
+    "correction": "Keep front at (-4,11.2) and middle at (32,-18); move only the rear turbine from (30,-37.2) to (-24,15) on the open lawn.",
+    "clearances": {
+      "solarNorthFenceMeters": 9.165,
+      "manufacturingApronMeters": 8.965,
+      "solarWestFenceMeters": 6.965,
+      "reflectingGardenMeters": 27.186,
+      "frontTurbineFoundationMeters": 18.115
+    },
+    "preserves": "Approved UI, camera/navigation, solar field and fence, manufacturing campus, utility yard, front turbine and middle turbine.",
+    "verification": "Source-derived role and clearance regression updated; rendered visual QA remains separate.",
+    "status": "SUPERSEDED_BY_BACK_LAWN_PLACEMENT_FIX"
+  },
+  "rearTurbineBackLawnFix": {
+    "issue": "The previous lawn placement still left the marked turbine too far forward at the solar-field edge.",
+    "correction": "Move only the marked rear turbine from (-24,15) to (-14,21), deeper into the backward/upper lawn in the arrow direction. Keep front and middle turbines unchanged.",
+    "clearances": {
+      "solarNorthFenceMeters": 15.165,
+      "manufacturingApronMeters": 2.965,
+      "solarWestFenceMeters": 16.965,
+      "reflectingGardenMeters": 17.231,
+      "frontTurbineFoundationMeters": 11.759
+    },
+    "preserves": "Approved UI, camera/navigation, solar field/fence, manufacturing campus, utility yard, front turbine and middle turbine.",
+    "verification": "Source-derived role and clearance regression updated; rendered visual QA remains separate.",
+    "note": "Rear turbine remains unchanged by v5.2.9."
+  },
+  "markedTurbineLeftBackLawnFix": {
+    "issue": "Latest annotated screenshot identifies the right/eastern middle turbine as the machine to relocate; earlier edits targeted the rear turbine instead.",
+    "correction": "Move only the middle/eastern turbine from (32,-18) to (-34.5,-27), on the far-left/back service lawn beside the utility area. Keep front (-4,11.2) and rear (-14,21) unchanged.",
+    "clearances": {
+      "solarWestFenceMeters": 1.396,
+      "westRoadCurbMeters": 1.396,
+      "frontTurbineFoundationMeters": 46.571,
+      "rearTurbineFoundationMeters": 50.055
+    },
+    "preserves": "Approved UI, camera/navigation, solar arrays/fence, utility equipment, manufacturing campus, front turbine and rear turbine.",
+    "verification": "Source-derived identity and clearance regression updated; rendered visual QA remains separate."
+  },
+  "foregroundTurbineBackyardLawnFix": {
+    "issue": "Latest annotated screenshot identifies the lower-right/foreground turbine as the turbine that must move backward; prior corrections targeted other turbines.",
+    "correction": "Move only the front turbine from (-4,11.2) to (-27,20), on the open back-yard lawn behind the solar field toward manufacturing. Keep middle (-34.5,-27) and rear (-14,21) unchanged.",
+    "clearances": {
+      "solarNorthFenceMeters": 13.992,
+      "manufacturingApronMeters": 3.793,
+      "solarWestFenceMeters": 3.793,
+      "reflectingGardenMeters": 29.942,
+      "rearTurbineFoundationMeters": 10.796,
+      "middleTurbineFoundationMeters": 45.283
+    },
+    "preserves": "Approved UI, camera/navigation, solar arrays/fence, utility equipment, manufacturing campus, middle turbine and rear turbine.",
+    "verification": "Source-derived identity and clearance regression updated; rendered visual QA remains separate."
+  },
+  "twoRightTurbinesLeftBackLawnFix": {
+    "issue": "Latest screenshot circles the two turbines beside the building and directs both to the far-left/back lawn; the turbine already on the left strip must remain unchanged.",
+    "correction": "Move front turbine from (-27,20) to (-34.5,-12) and rear turbine from (-14,21) to (-34.5,2). Keep middle turbine at (-34.5,-27).",
+    "clearances": {
+      "frontRoad": 1.292,
+      "frontFence": 1.292,
+      "middleRoad": 1.396,
+      "middleFence": 1.396,
+      "rearRoad": 1.465,
+      "rearFence": 1.465,
+      "frontMiddleGap": 12.689,
+      "rearFrontGap": 11.758,
+      "rearMiddleGap": 26.861
+    },
+    "preserves": "Approved UI, camera/navigation, solar field and fence, manufacturing campus, utility yard, and existing middle turbine placement.",
+    "verification": "Source-derived west-corridor and inter-turbine separation regression updated; rendered visual QA remains separate."
+  },
+  "centerTurbineUpperBackLawnFix": {
+    "issue": "Latest top-view screenshot circles the center turbine on the west strip and points it to the upper/back lawn; the far-left and lower-right turbines must remain fixed.",
+    "correction": "Move only the front/center turbine from (-34.5,-12) to (-27,20). Keep middle (-34.5,-27) and rear (-34.5,2) unchanged.",
+    "clearances": {
+      "solarNorth": 13.992,
+      "factorySouth": 3.793,
+      "solarWestCorner": 3.793,
+      "garden": 29.942,
+      "middleSeparation": 45.283,
+      "rearSeparation": 17.258,
+      "middleRoad": 1.396,
+      "middleFence": 1.396,
+      "rearRoad": 1.465,
+      "rearFence": 1.465,
+      "unchangedPairGap": 26.861
+    },
+    "preserves": "Approved UI, camera/navigation, solar field and fence, manufacturing campus, utility yard, lower-right turbine and far-left turbine.",
+    "verification": "Source-derived target-position and unchanged-turbine regressions updated; rendered visual QA remains separate."
+  },
+  "centerTurbineUpperRightLawnFix": {
+    "issue": "The prior change kept the marked turbine visually on the left side. The latest screenshot arrow clearly targets the upper-right/back lawn beside the road.",
+    "correction": "Move only the front/marked turbine from (-27,20) to (28,16). Keep middle (-34.5,-27) and rear (-34.5,2) unchanged.",
+    "clearances": {
+      "solarEast": 2.793,
+      "eastRoad": 5.268,
+      "solarNorth": 9.992,
+      "factorySouth": 7.793,
+      "garden": 5.025,
+      "middleSeparation": 73.552,
+      "rearSeparation": 61.806,
+      "middleRoad": 1.396,
+      "middleFence": 1.396,
+      "rearRoad": 1.465,
+      "rearFence": 1.465,
+      "unchangedPairGap": 26.861
+    },
+    "preserves": "Approved UI, camera/navigation, solar field/fence, manufacturing campus, utility yard, and both west-strip turbines.",
+    "verification": "Source-derived target-position and unchanged-turbine regressions updated; live WebGL visual verification to follow deployment."
+  },
+  "landscapeHardscapeFix": {
+    "issue": "Large landscape trees could be generated with trunks inside concrete/paved manufacturing aprons because tree placement only sampled terrain height and did not reject hardscape footprints.",
+    "correction": "Keep the concrete geometry. Add buffered no-tree zones for the manufacturing apron, lobby apron, east service apron, north loading court and west service apron; tree() now rejects any trunk landing in those zones.",
+    "affectedHardscapeZones": [
+      "manufacturing-apron",
+      "lobby-apron",
+      "east-service-apron",
+      "north-loading-court",
+      "west-service-apron"
+    ],
+    "preserves": "Concrete/service-court geometry, buildings, roads, UI, camera/navigation, turbines, PV field and intentional planter/shrub landscaping.",
+    "regression": "tests/landscape-hardscape.mjs"
+  },
+  "eastApronPlanterFix": {
+    "issue": "Small shrubs remained visible on the east service concrete apron because they came from an explicit planter row, not from the random tree generator.",
+    "correction": "Remove planter(20.8,34.0,.96,7.0,6,'z') so the east service concrete apron is completely clear of planted shrubs.",
+    "preserves": "Concrete apron geometry, buildings, roads, UI, camera/navigation, turbines, PV field and landscaping outside the east service apron.",
+    "regression": "tests/landscape-hardscape.mjs now asserts that the east-apron planter row is absent."
+  },
+  "eastApronEVServiceYard": {
+    "issue": "The east service apron was intentionally cleared of planting but remained visually/functionally empty.",
+    "correction": "Add two marked EV charging bays, two charger pedestals, two service cabinets, one compact service enclosure, protective bollards and service-zone markings.",
+    "apronBounds": {
+      "xMin": 17,
+      "xMax": 31,
+      "zMin": 30,
+      "zMax": 40
+    },
+    "placements": {
+      "evBays": [
+        [
+          20.4,
+          35
+        ],
+        [
+          23.3,
+          35
+        ]
+      ],
+      "chargers": [
+        [
+          20.4,
+          38.65
+        ],
+        [
+          23.3,
+          38.65
+        ]
+      ],
+      "serviceCabinets": [
+        [
+          27.25,
+          33.2
+        ],
+        [
+          28.65,
+          33.2
+        ]
+      ],
+      "serviceEnclosure": [
+        27.95,
+        36.15
+      ]
+    },
+    "preserves": "Approved UI, camera/navigation, concrete apron geometry, roads, buildings, turbines, PV field and landscaping outside the apron.",
+    "containment": "All added EV/service geometry is positioned within the existing 14m x 10m apron footprint."
+  },
+  "frontDriveTreeRelocation": {
+    "issue": "A cluster of landscape trees and a hedge occupied the concrete/asphalt front driveway in the manufacturing hero view.",
+    "correction": "Remove three trees from the cluster, relocate the remaining four to the adjacent front lawn, remove the pavement-edge hedge, and add a buffered front-driveway no-tree zone.",
+    "removedTrees": 3,
+    "relocatedTrees": [
+      [
+        -35.5,
+        34
+      ],
+      [
+        -32,
+        31
+      ],
+      [
+        -28.5,
+        28.4
+      ],
+      [
+        -25,
+        25.8
+      ]
+    ],
+    "frontDrivewayExclusion": {
+      "center": [
+        -5,
+        45.5
+      ],
+      "halfExtents": [
+        27,
+        4.2
+      ]
+    },
+    "preserves": "Buildings, roads, EV/service apron, approved UI, camera/navigation, turbines, PV field and all unrelated landscaping.",
+    "regression": "tests/front-drive-tree-relocation.mjs"
+  },
+  "frontLawnTreeClearance": {
+    "issue": "The user-marked front lawn / driveway pocket still contained the four trees that had been relocated there in the previous patch.",
+    "correction": "Remove all four relocated trees from the marked pocket and add a permanent front-lawn clear-zone so random tree placement is rejected there.",
+    "removedExplicitTrees": 4,
+    "clearZone": {
+      "center": [
+        -30,
+        31
+      ],
+      "halfExtents": [
+        10.5,
+        10.5
+      ]
+    },
+    "preserves": "Buildings, roads, EV/service apron, approved UI, camera/navigation, turbines, PV field and landscaping outside the marked area.",
+    "regression": "tests/front-lawn-tree-clearance.mjs"
+  },
+  "frontApproachTreeRemoval": {
+    "issue": "Three explicitly placed trees at (-5,21), (-10,22), and (3,22) remained in the red-marked front approach, so prior random-tree exclusions did not remove the visible cluster.",
+    "correction": "Delete those three explicit tree placements, add a front-approach clear zone centered at (-3.5,22), and make ornamentalTree honor the same exclusion system.",
+    "removedExplicitTrees": [
+      [
+        -5,
+        21
+      ],
+      [
+        -10,
+        22
+      ],
+      [
+        3,
+        22
+      ]
+    ],
+    "clearZone": {
+      "center": [
+        -3.5,
+        22
+      ],
+      "halfExtents": [
+        10.5,
+        5.5
+      ]
+    },
+    "preserves": "Buildings, roads, EV/service apron, approved UI, camera/navigation, turbines, PV field and landscaping outside the marked approach.",
+    "regression": "tests/front-approach-tree-removal.mjs"
+  },
+  "frontApproachLandscapeClear": {
+    "issue": "The visible cluster in the red-marked front approach was not only tree() geometry; it was also generated by a long planter row and hedge along the road.",
+    "correction": "Remove planter(-15.8,26.0,23,.96,16), remove hedge [-8,24,18], and make planter() honor the same hardscape/clear-zone exclusion system.",
+    "removed": {
+      "planter": "(-15.8,26.0,23,.96,16)",
+      "hedge": "[-8,24,18]"
+    },
+    "preserves": "Buildings, roads, EV/service apron, approved UI, camera/navigation, turbines, PV field and landscaping outside the marked approach.",
+    "regression": "tests/front-approach-landscape-clear.mjs"
+  },
+  "frontCrosswalkTreeClearance": {
+    "issue": "The red-marked cluster persisted because it was generated by the deterministic perimeter tree loop near the front crosswalk/road, outside the earlier clear zones.",
+    "calculatedWorldArea": {
+      "xMin": 7,
+      "xMax": 27,
+      "zMin": 46,
+      "zMax": 56
+    },
+    "clearZone": {
+      "center": [
+        17,
+        51
+      ],
+      "halfExtents": [
+        10,
+        5
+      ]
+    },
+    "deterministicHighQualityTreeCandidates": 9,
+    "previouslySuppressedCandidates": 2,
+    "newlySuppressedTrees": 7,
+    "correction": "Add the exact front-crosswalk clear zone to tree placement and make the perimeter shrub ring honor all landscaping exclusion zones.",
+    "preserves": "Buildings, roads, EV/service apron, approved UI, camera/navigation, turbines, PV field and landscaping outside the marked crosswalk pocket.",
+    "regression": "tests/front-crosswalk-tree-clearance.mjs"
+  },
+  "eastTurbinePairAndTreeClearance": {
+    "issue": "Latest annotated instructions require three independent corrections: remove the two trees south of the EV/service apron, move only the existing circled east turbine somewhat backward, and create one additional turbine at the '+' lawn position outside the solar fence.",
+    "treeCorrection": {
+      "removed": [
+        [
+          24,
+          23
+        ],
+        [
+          25,
+          17
+        ]
+      ],
+      "preserved": [
+        25,
+        12
+      ],
+      "clearZone": {
+        "center": [
+          24.5,
+          20
+        ],
+        "halfExtents": [
+          2.5,
+          5
+        ]
+      },
+      "note": "The explicit trees at (24,23) and (25,17) were removed, but the latest screenshot showed a different deterministic generated tree cluster. v5.4.3 clears that actual rendered object."
+    },
+    "turbineCorrection": {
+      "movedExisting": {
+        "from": [
+          28,
+          16,
+          1.05
+        ],
+        "to": [
+          28,
+          2,
+          1.05
+        ]
+      },
+      "addedNew": [
+        28,
+        -27,
+        0.96
+      ],
+      "unchangedWest": [
+        [
+          -34.5,
+          -27,
+          0.96
+        ],
+        [
+          -34.5,
+          2,
+          0.9
+        ]
+      ],
+      "alignment": "East upper/lower z coordinates now match the opposite west upper/lower turbines at z=2 and z=-27."
+    },
+    "clearances": {
+      "movedEastFenceMeters": 2.793,
+      "movedEastRoadMeters": 5.268,
+      "newEastFenceMeters": 2.896,
+      "newEastRoadMeters": 5.371,
+      "eastPairFoundationGapMeters": 26.689
+    },
+    "preserves": "Approved UI, cameras/navigation, PV field/fence, EV/service apron, buildings and all wind turbines not explicitly targeted.",
+    "regression": [
+      "tests/solar-clearance.mjs",
+      "tests/east-turbine-pair-tree-clearance.mjs"
+    ]
+  },
+  "eastServiceRenderedTreeClearance": {
+    "issue": "The latest screenshot still showed a large tree/canopy cluster beside the east service apron because it came from the deterministic perimeter tree generator, not the explicit tree coordinates removed in v5.4.2.",
+    "calculatedSource": {
+      "generator": "high-quality deterministic perimeter tree loop",
+      "candidateIndex": 79,
+      "x": 27.585,
+      "z": 41.573,
+      "heightMeters": 5.4
+    },
+    "correction": "Add a dedicated exclusion rectangle centered at (27.6,41.6) so the generated tree object in the screenshot-marked pocket is rejected before geometry creation.",
+    "clearZone": {
+      "center": [
+        27.6,
+        41.6
+      ],
+      "halfExtents": [
+        3.4,
+        3.4
+      ],
+      "effectiveWithTreeClearance": [
+        4.15,
+        4.15
+      ]
+    },
+    "preserves": "Four-turbine layout from v5.4.2, EV/service equipment, buildings, roads, PV field/fence, UI/cameras and landscaping outside the screenshot-marked pocket.",
+    "regression": [
+      "tests/east-service-rendered-tree-clearance.mjs",
+      "tests/solar-clearance.mjs"
+    ],
+    "incidentalRepair": "Correct the over-escaped turbine regex in tests/solar-clearance.mjs so the four-turbine source regression matches production calls again."
+  },
+  "twoSpecificTreeRemovals": {
+    "issue": "Latest annotated screenshot identifies exactly two remaining trees: #1 in front of the EV/service apron and #2 behind the pond.",
+    "correction": {
+      "tree1": "Hard-suppress deterministic perimeter tree candidate index 79 in the generation loop.",
+      "tree2": "Remove explicit tree placement at (25,12).",
+      "broadZoneCleanup": "Remove the broad v5.4.3 east-service rendered-tree exclusion rectangle so unrelated trees/vegetation are not suppressed."
+    },
+    "preserves": {
+      "allOtherTrees": "All other tree() placements remain unchanged.",
+      "windmills": [
+        [
+          28,
+          2,
+          1.05
+        ],
+        [
+          -34.5,
+          -27,
+          0.96
+        ],
+        [
+          -34.5,
+          2,
+          0.9
+        ],
+        [
+          28,
+          -27,
+          0.96
+        ]
+      ],
+      "ui": "Approved UI, cameras/navigation, buildings, roads, EV/service yard, pond and PV field remain unchanged."
+    },
+    "regression": "tests/two-specific-tree-removals.mjs"
+  },
+  "screenshotMappedTwoTreeRemoval": {
+    "issue": "The previous commits targeted the wrong generated tree identity for the two red-circled trees.",
+    "mapping": {
+      "tree1": {
+        "description": "tree in front of the EV/service apron beside the road",
+        "worldCenter": [
+          22.87,
+          43.79
+        ],
+        "removalRadius": 1.8
+      },
+      "tree2": {
+        "description": "tree behind the pond on the lawn toward the solar-field side",
+        "worldCenter": [
+          25,
+          12
+        ],
+        "removalRadius": 1.8
+      }
+    },
+    "correction": "Remove generated tree groups by their actual world positions after tree generation, preserving RNG and therefore all unrelated tree placements. Keep the explicit (25,12) tree call absent.",
+    "preserves": {
+      "windmills": [
+        [
+          28,
+          2,
+          1.05
+        ],
+        [
+          -34.5,
+          -27,
+          0.96
+        ],
+        [
+          -34.5,
+          2,
+          0.9
+        ],
+        [
+          28,
+          -27,
+          0.96
+        ]
+      ],
+      "otherTrees": "Unrelated generated tree positions are not regenerated or shifted by this removal pass.",
+      "otherScene": "Buildings, roads, EV/service equipment, pond, PV field/fence, UI and cameras unchanged."
+    },
+    "regression": "tests/two-specific-tree-removals.mjs"
+  }
+}
