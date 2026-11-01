@@ -1,4 +1,5 @@
 import { EnergyScene, CHAPTERS, chapterAt, detectQuality } from "./scene.js";
+import { mountExploreUI } from "./explore-ui.js";
 
 const state = { progress: 0, mouse: { x: 0, y: 0 }, exploring: false, chapter: 0, mode: "pending", ready: false };
 const qs = (id) => document.getElementById(id);
@@ -10,6 +11,8 @@ const fallback = qs("fallback");
 const heroCopy = qs("hero-copy");
 const sceneStatus = qs("scene-status");
 const explorePanel = qs("explore-panel");
+let activeScene = null;
+let facilityUI = null;
 const rail = qs("chapter-rail");
 const scrollCue = qs("scroll-cue");
 
@@ -80,6 +83,7 @@ function updateScroll() {
 }
 
 function setExplore(next) {
+  if (!next && activeScene?.interiorMode) activeScene.exitInterior();
   if (next && !(state.mode === "high" || state.mode === "lite")) return;
   state.exploring = next;
   app.classList.toggle("is-exploring", next);
@@ -91,6 +95,7 @@ function setExplore(next) {
   sceneStatus.hidden = next;
   explorePanel.hidden = !next;
   scrollCue.hidden = next;
+  facilityUI?.update();
 }
 
 qs("explore").addEventListener("click", () => setExplore(true));
@@ -103,7 +108,12 @@ window.addEventListener("pointermove", (event) => {
   state.mouse.y = -((event.clientY / Math.max(1, innerHeight)) * 2 - 1);
 }, { passive: true });
 window.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && state.exploring) { event.preventDefault(); setExplore(false); return; }
+  if (event.key === "Escape" && state.exploring) {
+    event.preventDefault();
+    if (activeScene?.interiorMode) {activeScene.exitInterior();facilityUI?.update();}
+    else setExplore(false);
+    return;
+  }
   if (state.exploring) return;
   if (event.key === "ArrowDown" || event.key === "PageDown") { event.preventDefault(); goTo(state.chapter + 1); }
   if (event.key === "ArrowUp" || event.key === "PageUp") { event.preventDefault(); goTo(state.chapter - 1); }
@@ -124,8 +134,10 @@ if (state.mode === "high" || state.mode === "lite") {
       getChapter: () => state.chapter,
       onReady: () => { state.ready = true; loader.hidden = true; },
     });
+    activeScene = scene;
+    facilityUI = mountExploreUI(scene, explorePanel);
     scene.start();
-    window.addEventListener("beforeunload", () => scene.dispose(), { once: true });
+    window.addEventListener("beforeunload", () => {facilityUI?.dispose();scene.dispose();}, { once: true });
   } catch (error) {
     console.error(error);
     state.mode = "fallback";
