@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import {enhanceInterior,POLISH_REVISION} from './interior-polish.js';
 
 /**
  * Five conceptual, explorable process interiors embedded inside the existing
  * Convalt hall envelopes. No exterior node or site transform is modified.
  * World coordinates, dimensions and campus scale are inherited from V5.4.5.
  */
-export const INTERIOR_REVISION = 'convalt-interior-exterior-v1.0.0';
+export const INTERIOR_REVISION = 'convalt-interior-exterior-v1.1.0';
 export const INTERIOR_SPACES = Object.freeze([
   {id:'manufacturing',label:'Manufacturing plant',short:'Manufacturing',kind:'factory',x:-16,z:35,w:34,d:18,h:7,yaw:0,
    entrance:[0,0],description:'Illustrative HJT manufacturing flow, service lanes and production equipment.'},
@@ -31,7 +32,7 @@ export function createCampusInteriors(scene,{high=true}={}){
   const root=new THREE.Group();
   root.name='conceptual-walkable-interiors';
   scene.add(root);
-  const shapes=new Map(), materials=[], zones=new Map(), animated=[], lamps=[];
+  const shapes=new Map(), materials=[], zones=new Map(), animated=[], lamps=[],polishStages=[];
   const mat=(hex,metalness=0,roughness=.68,emissive=0x000000,eIntensity=0)=>
     {const m=new THREE.MeshStandardMaterial({color:hex,metalness,roughness,emissive,emissiveIntensity:eIntensity});materials.push(m);return m;};
   const finish=mat(0x657c78,.26,.66),floor=mat(0x788884,.08,.89),
@@ -163,6 +164,8 @@ export function createCampusInteriors(scene,{high=true}={}){
       drum.rotation.z=Math.PI/2;
       animated.push({object:drum,axis:'z',speed:.20,zone:def.id});
     }
+    // All detail is local to the existing hall; no exterior geometry is touched.
+    polishStages.push(enhanceInterior(zone,def,{high}));
   }
   let active=null;
   return {
@@ -193,7 +196,7 @@ export function createCampusInteriors(scene,{high=true}={}){
       }
     },
     audit(){
-      return {revision:INTERIOR_REVISION,spaces:INTERIOR_SPACES.map(def=>{
+      return {revision:INTERIOR_REVISION,polishRevision:POLISH_REVISION,spaces:INTERIOR_SPACES.map(def=>{
         const z=zones.get(def.id);return {id:def.id,center:[def.x,def.z],
           bounds:[def.w,def.d,def.h],obstacles:z.obstacles.length,spawn:findSpawn(def)};
       })};
@@ -203,6 +206,7 @@ export function createCampusInteriors(scene,{high=true}={}){
       for(const g of shapes.values())g.dispose();
       for(const m of materials)m.dispose();
       for(const light of lamps)light.dispose?.();
+      for(const polish of polishStages)polish.dispose();
       zones.clear();
     }
   };
