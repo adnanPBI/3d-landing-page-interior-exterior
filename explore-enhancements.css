@@ -1,30 +1,42 @@
-/* Additive styles only, scoped to the existing Convalt Free Explore panel. */
+/* Additive styles only, scoped to the existing Convalt Free Explore panel & 360° orbit dock. */
 #explore-panel.with-facility-tools{
   max-height:min(78vh,730px);overflow-y:auto;overscroll-behavior:contain;
-  scrollbar-width:thin;width:min(315px,calc(100vw - 28px));bottom:100px;
+  scrollbar-width:thin;width:min(318px,calc(100vw - 28px));bottom:100px;
 }
 #explore-panel.with-facility-tools.inside-building{
   background:linear-gradient(155deg,rgba(8,39,32,.96),rgba(6,25,23,.92));
 }
 .facility-tools{border-top:1px solid rgba(232,244,211,.17);padding-top:12px;margin-top:11px}
 .facility-caption,.facility-inside-title{display:flex;align-items:center;gap:7px;color:#d5efa4;font-size:9px;letter-spacing:.16em;font-weight:600}
-.facility-pip{height:5px;width:5px;border-radius:50%;background:#d5efa4}
+.facility-pip{height:5px;width:5px;border-radius:50%;background:#d5efa4;display:inline-block}
 .facility-tools label{display:block;margin:12px 0 5px;color:rgba(239,244,233,.71);font-size:10px}
 .facility-tools select{width:100%;border:1px solid rgba(236,255,229,.23);border-radius:8px;background:#183a30;color:#f2f4ea;padding:10px 9px;font:500 12px "Outfit",system-ui,sans-serif}
 .facility-tools .facility-description{margin:9px 0 11px;line-height:1.45;color:#d0d9d0;font-size:10px}
 .facility-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 #explore-panel .facility-actions button,#explore-panel .facility-walk>button{font:500 10px "Outfit",system-ui,sans-serif;padding:10px 7px}
 #explore-panel .facility-actions button:last-child{background:#dcedaa;color:#102820;border-color:#dcedaa}
+.facility-orbit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:7px}
+.facility-preset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:5px}
+#explore-panel .facility-orbit-grid button,#explore-panel .facility-preset-grid button{
+  padding:7px 4px;font:500 9.5px "Outfit",system-ui,sans-serif;width:100%;border-radius:8px;
+}
 .facility-lighting{display:flex;gap:5px;align-items:center;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.11);margin-top:11px;padding-top:11px}
 .facility-lighting span{width:100%;color:rgba(235,240,218,.65);font-size:9px;letter-spacing:.16em}
 #explore-panel .facility-lighting button{width:auto;flex:1;padding:9px 5px;font-size:10px}
-.facility-lighting button[aria-pressed=true]{border-color:rgba(219,242,160,.65)!important;color:#def2aa!important}
+.facility-lighting button[aria-pressed=true],.facility-pivot-bar button[aria-pressed=true],button[data-ext-turntable][aria-pressed=true]{
+  border-color:rgba(219,242,160,.65)!important;color:#def2aa!important;background:rgba(219,242,160,.16)!important
+}
+.facility-pivot-bar{display:grid;grid-template-columns:1fr 1fr auto;gap:5px;margin:7px 0}
+#explore-panel .facility-pivot-bar button{padding:7px 6px;font:500 9.5px "Outfit",system-ui,sans-serif;width:auto}
 .facility-note{margin-top:10px;font-size:9px;line-height:1.45;color:rgba(245,249,230,.52)}
 .facility-walk{margin-top:10px}
 .facility-walk p{font-size:10px!important;margin:8px 0!important}
 .facility-dpad{display:grid;grid-template-columns:repeat(3,44px);justify-content:center;gap:4px;margin:8px auto}
-#explore-panel .facility-dpad button{min-height:42px;padding:3px;font-size:19px;touch-action:none}
+#explore-panel .facility-dpad button{min-height:42px;padding:3px;font-size:18px;touch-action:none}
 #explore-panel [hidden]{display:none!important}
+
+@media(max-width:860px){
+}
 @media(max-width:650px){
   #explore-panel.with-facility-tools{right:12px;bottom:94px;width:min(300px,calc(100vw - 24px));max-height:62vh}
   .facility-note{display:none}

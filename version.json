@@ -1,5 +1,5 @@
 {
-  "revision": "convalt-interior-exterior-v1.1.0-20261101",
+  "revision": "convalt-interior-exterior-v1.2.0-preserved-site-heavy-20261108",
   "sourceRepository": "adnanPBI/3d-landing-page-energy-company",
   "sourceBranch": "main",
   "baseCommit": "98b992b4890248b30d8052d93daaaf0e83f04222",
@@ -7,13 +7,13 @@
     "campus.js": "7bcd4ea716879d3525a272eb8a6812dd63f0affa",
     "campus-materials.js": "07af3820680b4fbaf00d5c1307bca4c5b1978268",
     "campus-water.js": "a8e69c96af1e873d8de4b197014d98198e8d2f14",
-    "scene.js": "918c05de4f5f67dca6cb031051ec30943117e8d2",
+    "scene.js": "75c5abc1dfd7e06e1765eb548f05d6ca9dbe3b4f",
     "campus-fence.js": "4fa8aa442fcab02d579f1261bd806bccb89b5404",
     "app.js": "b063ecfa05f5150fbf6cd3992f2ee3335722f69e",
-    "campus-interiors.js": "47c681cba5dd02eb47d0cde0eb66dcc7a6099dc2",
-    "explore-ui.js": "c571e8ea026b52467e3db63384cefd10d181b2b3",
-    "explore-enhancements.css": "2faf89959880e78dd1326700af0d2bf0ad88cc1f",
-    "interior-polish.js": "4dfc3ffa723b54ec151007318a964064089062e4"
+    "campus-interiors.js": "e2313497ceea71c012e770d64c5128564615c91e",
+    "explore-ui.js": "3b7496335d4ed856c3cb49fcc1cf17678e52d94a",
+    "explore-enhancements.css": "0004231873ab4501f7008f5a3c21900e7a41ae99",
+    "interior-polish.js": "0a7618cd6b6477497a887bb01743394c0ddaf4c2"
   },
   "preservedUIBlobs": {
     "index.html": "f7c5baa8bbcc856dd776aebd4776847c2c4f02fd",
@@ -571,7 +571,7 @@
       "index.html": "f7c5baa8bbcc856dd776aebd4776847c2c4f02fd",
       "styles.css": "e75303165de4674aa9bdd4fd5a9ccc4a8e8115ff"
     },
-    "interiorRevision": "convalt-interior-exterior-v1.1.0",
+    "interiorRevision": "convalt-interior-exterior-v1.2.0",
     "interiorZones": [
       {
         "id": "manufacturing",
@@ -640,7 +640,7 @@
     "verification": {
       "sourceParity": "sha1 blob parity checked on protected paths",
       "functionalChecks": "Node 22 syntax/source-contract GitHub Actions passed on committed module revisions; full WebGL QA is separate.",
-      "browserWebGL": "pending real browser verification",
+      "browserWebGL": "PASS in local Windows Chrome Playwright; production browser QA pending",
       "physicalDeviceFPS": "not certified"
     },
     "interiorPolish": {
@@ -657,5 +657,31 @@
       "verifiedSourceContract": "Windows CRLF-safe hash regression passed on RND Windows device",
       "browserQA": "Pending live browser audit"
     }
-  }
+  },
+  "zipSourceSha256": "9a82c1196731adc0024fe27fb7ffed9ff2da8187df2776d41079eab2b8e643e0",
+  "scopePolicy": "Only existing building interiors and existing Explore-panel interactions; no new facilities, site mapping or exterior structural edits.",
+  "protectedExteriorBlobs": {
+    "campus.js": "7bcd4ea716879d3525a272eb8a6812dd63f0affa",
+    "index.html": "f7c5baa8bbcc856dd776aebd4776847c2c4f02fd",
+    "styles.css": "e75303165de4674aa9bdd4fd5a9ccc4a8e8115ff",
+    "campus-fence.js": "4fa8aa442fcab02d579f1261bd806bccb89b5404",
+    "campus-materials.js": "07af3820680b4fbaf00d5c1307bca4c5b1978268",
+    "campus-water.js": "a8e69c96af1e873d8de4b197014d98198e8d2f14"
+  },
+  "heavyUpdateExclusions": [
+    "new BESS/substation yard",
+    "new green hydrogen plant",
+    "new exterior EV structures and animated vehicles",
+    "floating full-page orbit dock",
+    "exterior materials/water modifications"
+  ],
+  "interiorSpaces": [
+    "manufacturing",
+    "headquarters",
+    "compute-01",
+    "compute-02",
+    "compute-03",
+    "recycling"
+  ],
+  "qaStatus": "PASS: Windows Chrome WebGL2 initialized and six interiors entered, moved and exited; zero JS page errors and zero failed requests. Physical device FPS not certified."
 }

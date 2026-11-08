@@ -25,3 +25,6 @@ jobs:
           node --check campus.js
       - name: Preserved exterior and new exploration contracts
         run: node --test tests/interior-explore-contract.mjs
+
+      - name: Verify heavy update preserves exterior
+        run: node --test tests/heavy-zip-preservation.mjs
